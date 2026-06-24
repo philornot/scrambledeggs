@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "scrambledeggs",
+  "version": "0.6.6",
+  "name": "Scrambled Eggs",
+  "description": "Adds scrambled eggs — a food item crafted from 3 eggs.",
+  "authors": ["philornot"],
+  "license": "MIT",
+  "icon": "assets/scrambledeggs/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "com.philornot.scrambledeggs.Scrambledeggs"
+      }
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~26.1",
+    "java": ">=25",
+    "fabric-api": "*",
+    "fabric-language-kotlin": "*"
+  }
+}

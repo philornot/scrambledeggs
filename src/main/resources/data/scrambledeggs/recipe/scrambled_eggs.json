@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:egg",
+    "minecraft:egg",
+    "minecraft:egg"
+  ],
+  "result": {
+    "id": "scrambledeggs:scrambled_eggs",
+    "count": 1
+  }
+}
