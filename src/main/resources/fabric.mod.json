@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "scrambledeggs",
-  "version": "0.6.6",
+  "version": "${version}",
   "name": "Scrambled Eggs",
   "description": "Adds scrambled eggs — a food item crafted from 3 eggs.",
   "authors": ["philornot"],
@@ -18,7 +18,7 @@
   },
   "depends": {
     "fabricloader": ">=0.16.0",
-    "minecraft": "~26.1",
+    "minecraft": "${minecraft_dependency_version}",
     "java": ">=25",
     "fabric-api": "*",
     "fabric-language-kotlin": "*"

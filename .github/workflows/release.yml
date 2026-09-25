@@ -1,0 +1,79 @@
+# Builds a release jar for each supported Minecraft version and publishes
+# each one as its own GitHub Release.
+#
+# Trigger manually from the Actions tab ("Run workflow"), or by pushing a
+# tag matching "v*" (e.g. v1.0.0).
+
+name: release
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    strategy:
+      # One matrix leg per Minecraft version we ship a release for.
+      # Add a new entry here to support another Minecraft version later.
+      matrix:
+        include:
+          - minecraft_version: "26.2"
+            fabric_api_version: "0.161.0+26.2"
+            minecraft_dependency_version: "~26.2"
+          - minecraft_version: "26.3"
+            fabric_api_version: "0.161.0+26.3"
+            minecraft_dependency_version: "~26.3"
+      # Let one leg finish/fail independently of the other.
+      fail-fast: false
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: read mod version
+        id: mod_version
+        run: |
+          version=$(grep '^mod_version=' gradle.properties | cut -d'=' -f2)
+          echo "value=$version" >> "$GITHUB_OUTPUT"
+
+      - name: build for Minecraft ${{ matrix.minecraft_version }}
+        run: |
+          ./gradlew build \
+            -Pminecraft_version=${{ matrix.minecraft_version }} \
+            -Pfabric_api_version=${{ matrix.fabric_api_version }} \
+            -Pminecraft_dependency_version=${{ matrix.minecraft_dependency_version }}
+
+      - name: capture build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: Artifacts-mc${{ matrix.minecraft_version }}
+          path: build/libs/
+
+      - name: create release for Minecraft ${{ matrix.minecraft_version }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.mod_version.outputs.value }}-mc${{ matrix.minecraft_version }}
+          name: Scrambled Eggs ${{ steps.mod_version.outputs.value }} (Minecraft ${{ matrix.minecraft_version }})
+          body: |
+            Build of Scrambled Eggs ${{ steps.mod_version.outputs.value }} for Minecraft ${{ matrix.minecraft_version }}.
+
+            Requires:
+            - Fabric Loader ${{ '>=0.16.0' }}
+            - Fabric API ${{ matrix.fabric_api_version }} (or newer for ${{ matrix.minecraft_version }})
+          files: build/libs/*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
